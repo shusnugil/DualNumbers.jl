@@ -11,23 +11,28 @@ struct Dual{T}
     dual::T
 end
 
-function Base.:+(p::Dual, q::Dual)
-    x = p.real + q.real
-    y = p.dual + q.dual
-    return Dual(x,y)
-end
+# negation and identity
+Base.:-(x::Dual) = Dual(-x.real, -x.dual)
+Base.:+(x::Dual) = Dual(+x.real, +x.dual)
 
-function Base.:*(p::Dual, q::Dual)
-    x = p.real * q.real
-    y = p.real * q.dual + p.dual * q.real
-    return Dual(x,y)
-end
+# addition and substraction operators
+Base.:+(x::Dual, y::Dual) = Dual(x.real + y.real, x.dual + y.dual)
+Base.:-(x::Dual, y::Dual) = x + -y
 
-function Base.:-(p::Dual, q::Dual)
-    x = p.real - q.real
-    y = p.dual - q.dual
-    return Dual(x,y)
-end
+# scalar multiplication
+Base.:*(a::Number, x::Dual) = Dual(a*x.real, a*x.dual)
+Base.:*(x::Dual, a::Number) = Dual(a*x.real, a*x.dual)
 
-#function Base.:-(x::Dual) = ()
+# multiplication
+Base.:*(x::Dual, y::Dual) = Dual(x.real *  y.real, x.real *  y.dual + x.dual *  y.real)
+
+# conjugation
+Base.conj(x::Dual) = Dual(x.real, - x.dual)
+
+# inverse
+Base.inv(x::Dual) = conj(x) * (1 / x.real^2)
+
+# division
+Base.:/(x::Dual, y::Dual) = x * inv(y)
+
 end # module DualNumbers
